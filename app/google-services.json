@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "266531376855",
+    "firebase_url": "https://sttpost-3beec.firebaseio.com",
+    "project_id": "sttpost-3beec",
+    "storage_bucket": "sttpost-3beec.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:266531376855:android:0a35e788e2db12cc",
+        "android_client_info": {
+          "package_name": "ca.canada.sttpost"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "266531376855-pkt8lo38ba3u2aqprhecr5f4ponharhr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ca.canada.sttpost",
+            "certificate_hash": "507f0ca3bfca3825757f98c063bdd54cd9c93e34"
+          }
+        },
+        {
+          "client_id": "266531376855-vuq2lcqi890cm5jprpag15ujb3tanvoi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBskkISgDpPtHspnHhAcItyJu4BVQEuLLE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "266531376855-vuq2lcqi890cm5jprpag15ujb3tanvoi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
