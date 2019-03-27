@@ -49,11 +49,15 @@ public class MainActivity extends AppCompatActivity {
 
     private final int REQ_CODE_SPEECH_INPUT = 100;
     static final int REQUEST_TAKE_PHOTO = 1;
+    public static Uri imgUri;
+    public static String fileDir;
+
+
     private EditText voiceInput;
     private TextView btnSpeak;
     private Button btnPost, btnPhoto;
     private ImageView imgView;
-    private Uri filePath;
+//    private Uri imgUri;
     private String currentPhotoPath;
     private String downloadUrl = "";
     private Post post;
@@ -69,6 +73,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        imgUri = null;
+        fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
 
         voiceInput = (EditText) findViewById(R.id.voiceInput);
         imgView = (ImageView) findViewById(R.id.imgView);
@@ -138,8 +145,10 @@ public class MainActivity extends AppCompatActivity {
             // Create the File where the photo should go
             File photoFile = null;
             try {
-                photoFile = createImageFile();
-            } catch (IOException ex) {
+//                String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+                photoFile = CameraFeature.createImageFile(fileDir);
+                currentPhotoPath = photoFile.getAbsolutePath();
+            } catch (Exception e) {
                 // Error occurred while creating the File
                 // ...
             }
@@ -214,14 +223,15 @@ public class MainActivity extends AppCompatActivity {
     private void uploadImage() {
 
         /** If there is an image, upload it, get the URL and set that URL as argument when calling uploadRest()*/
-        if(filePath != null)
+        if(imgUri != null)
         {
             final ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            final StorageReference ref = storageReference.child("images/" + filePath.getLastPathSegment());
-            ref.putFile(filePath)
+//            final StorageReference ref = storageReference.child("images/" + imgUri.getLastPathSegment());
+            final StorageReference ref = storageReference.child("images/pic.jpg");
+            ref.putFile(imgUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -261,16 +271,20 @@ public class MainActivity extends AppCompatActivity {
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
+//        String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "pic";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
-        );
+//        File image = File.createTempFile(
+//                imageFileName,  /* prefix */
+//                ".jpg",         /* suffix */
+//                storageDir      /* directory */
+//        );
+        File image = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/pic6189196398872236337.jpg");
+
 
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
+        System.out.println(currentPhotoPath);
         return image;
     }
 
@@ -310,7 +324,7 @@ public class MainActivity extends AppCompatActivity {
 //        byte[] b = baos.toByteArray();
 //        imgCode = Base64.encodeToString(b, Base64.DEFAULT);
 
-        filePath = Uri.fromFile(new File(currentPhotoPath));
+        imgUri = Uri.fromFile(new File(currentPhotoPath));
 
     }
 
@@ -322,6 +336,13 @@ public class MainActivity extends AppCompatActivity {
         } else {
             uploadImage();
         }
-        filePath = null;
+        imgUri = null;
+    }
+
+    public void test(View view) {
+        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+        System.out.println(path);
+        CameraFeature.createImageFile(path);
+//        CameraFeature.test();
     }
 }
