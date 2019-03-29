@@ -5,7 +5,6 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -15,7 +14,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,11 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -35,10 +30,8 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,18 +40,19 @@ import java.util.TimeZone;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final int REQ_CODE_SPEECH_INPUT = 100;
-    static final int REQUEST_TAKE_PHOTO = 1;
+    static final int REQ_CODE_SPEECH_INPUT = 100;
+    static final int REQ_CODE_TAKE_PHOTO = 1;
     public static Uri imgUri;
     public static String fileDir;
-
+    public File photoFile = null;
+    public String currentPhotoPath;
 
     private EditText voiceInput;
     private TextView btnSpeak;
     private Button btnPost, btnPhoto;
     private ImageView imgView;
 //    private Uri imgUri;
-    private String currentPhotoPath;
+
     private String downloadUrl = "";
     private Post post;
 //    private String imgCode = "";
@@ -92,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                askSpeechInput();
+                dispatchSpeechIntent();
             }
         });
 
@@ -124,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Showing google speech input dialog
-    private void askSpeechInput() {
+    private void dispatchSpeechIntent() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -143,7 +137,6 @@ public class MainActivity extends AppCompatActivity {
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
-            File photoFile = null;
             try {
 //                String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
                 photoFile = CameraFeature.createImageFile(fileDir);
@@ -158,12 +151,12 @@ public class MainActivity extends AppCompatActivity {
                         "ca.canada.sttpost.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                startActivityForResult(takePictureIntent, REQ_CODE_TAKE_PHOTO);
             }
         }
     }
 
-    // Receiving speech input
+    // Receiving and treating speech or picture results
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -177,12 +170,12 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
             }
-            case REQUEST_TAKE_PHOTO: {
+            case REQ_CODE_TAKE_PHOTO: {
                 if (resultCode == RESULT_OK) {
-                    setPic();
+                    CameraFeature.setPic(imgView, currentPhotoPath);
+//                    setPic();
                 }
             }
-
         }
     }
 

@@ -48,7 +48,7 @@ public class CameraFeature {
      * @param imgView   The ImageView component that contains the picture
      * @param imgPath   The path to the image to display
      */
-    private void setPic(ImageView imgView, String imgPath) {
+    public static void setPic(ImageView imgView, String imgPath) {
         // Get the dimensions of the View
         int targetW = imgView.getWidth();
         int targetH = imgView.getHeight();
