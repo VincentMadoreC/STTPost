@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
     static final int REQ_CODE_TAKE_PHOTO = 1;
     static final int REQ_CODE_EDIT_TEXT = 2;
     public static Uri imgUri;
-    public static String fileDir;
+//    public static String fileDir;
+    public static File fileDir;
     public File photoFile = null;
     public String currentPhotoPath;
 
@@ -69,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         imgUri = null;
-        fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+//        fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+        fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         textView = (TextView) findViewById(R.id.voiceInput);
         imgView = (ImageView) findViewById(R.id.imgView);
@@ -124,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // Showing google speech input dialog
+    // Shows the Google speech input dialog
     private void dispatchSpeechIntent() {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -139,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // Opens the camera
     private void dispatchTakePictureIntent() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -146,7 +149,9 @@ public class MainActivity extends AppCompatActivity {
             // Create the File where the photo should go
             try {
 //                String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+//                photoFile = CameraFeature.createImageFile(fileDir);
                 photoFile = CameraFeature.createImageFile(fileDir);
+                System.out.println(photoFile.getAbsolutePath());
                 currentPhotoPath = photoFile.getAbsolutePath();
             } catch (Exception e) {
                 // Error occurred while creating the File
@@ -285,15 +290,15 @@ public class MainActivity extends AppCompatActivity {
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-//        String imageFileName = "JPEG_" + timeStamp + "_";
-        String imageFileName = "pic";
+        String imageFileName = "JPEG_" + timeStamp + "_";
+//        String imageFileName = "pic";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-//        File image = File.createTempFile(
-//                imageFileName,  /* prefix */
-//                ".jpg",         /* suffix */
-//                storageDir      /* directory */
-//        );
-        File image = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/pic6189196398872236337.jpg");
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+//        File image = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/pic6189196398872236337.jpg");
 
 
         // Save a file: path for use with ACTION_VIEW intents
@@ -355,21 +360,35 @@ public class MainActivity extends AppCompatActivity {
 
     private void uploadPost() {
 //        if (TextUtils.isEmpty(body) && imgView.getDrawable() == null) {
+        Upload2 upload2 = new Upload2();
         if (textView.getText() == null && imgView.getDrawable() == null) {
             Toast.makeText(this, "Say something or take a picture first!", Toast.LENGTH_LONG).show();
         } else {
-            Upload.uploadText(this, textView);
-            Upload.uploadImage(this, imgView);
+            upload2.uploadText(this, textView);
+            upload2.uploadImage(this, imgView, imgUri);
+
+            // Deletes the image from the device
+            CameraFeature.deleteImageFile(photoFile.getAbsolutePath());
+            photoFile = null;
         }
+
+//        if (textView.getText() == null && imgView.getDrawable() == null) {
+//            Toast.makeText(this, "Say something or take a picture first!", Toast.LENGTH_LONG).show();
+//        } else {
+//            Upload.uploadText(this, textView);
+//            Upload.uploadImage(this, imgView);
+//        }
+
+
         imgUri = null;
     }
-
-    public void test(View view) {
-        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
-        System.out.println(path);
-        CameraFeature.createImageFile(path);
-//        CameraFeature.test();
-    }
+//
+//    public void test(View view) {
+//        String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
+//        System.out.println(path);
+//        CameraFeature.createImageFile(path);
+////        CameraFeature.test();
+//    }
 
     public void printStuff(View view) {
         System.out.println(imgUri);

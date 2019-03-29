@@ -8,7 +8,11 @@ import android.os.Environment;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
+// Check https://developer.android.com/training/camera/photobasics.html for help
 public class CameraFeature {
 
     public static final String IMAGE_NAME = "/pic.jpg";
@@ -18,21 +22,40 @@ public class CameraFeature {
      * @param fileDir The directory where the image will be saved
      * @return
      */
-    public static File createImageFile(String fileDir) {
-        File imgFile = new File(fileDir + IMAGE_NAME);
-        try {
-            if (imgFile.exists()) {
-                imgFile.delete();
-            }
-            imgFile.createNewFile();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return imgFile;
+//    public static File createImageFile(String fileDir) {
+//        File imgFile = new File(fileDir + IMAGE_NAME);
+//        try {
+//            if (imgFile.exists()) {
+//                imgFile.delete();
+//            }
+//            imgFile.createNewFile();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return imgFile;
+//    }
+
+    public static File createImageFile(File fileDir) throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                fileDir      /* directory */
+        );
+//        File image = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/pic6189196398872236337.jpg");
+
+
+        // Save a file: path for use with ACTION_VIEW intents
+//        currentPhotoPath = image.getAbsolutePath();
+//        System.out.println(currentPhotoPath);
+        return image;
     }
 
-    public static void deleteImageFile(String fileDir) {
-        File imgFile = new File(fileDir + IMAGE_NAME);
+    public static void deleteImageFile(String filePath) {
+        File imgFile = new File(filePath);
         try {
             if (imgFile.exists()) {
                 imgFile.delete();
