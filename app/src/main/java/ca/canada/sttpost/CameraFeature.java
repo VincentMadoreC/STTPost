@@ -1,10 +1,8 @@
 package ca.canada.sttpost;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Environment;
 import android.widget.ImageView;
 
 import java.io.File;
@@ -15,26 +13,11 @@ import java.util.Date;
 // Check https://developer.android.com/training/camera/photobasics.html for help
 public class CameraFeature {
 
-    public static final String IMAGE_NAME = "/pic.jpg";
-
     /**
      * Creates an empty image file to write on
-     * @param fileDir The directory where the image will be saved
-     * @return
+     * @param fileDir   The directory where the image will be saved
+     * @return          The file containing the image
      */
-//    public static File createImageFile(String fileDir) {
-//        File imgFile = new File(fileDir + IMAGE_NAME);
-//        try {
-//            if (imgFile.exists()) {
-//                imgFile.delete();
-//            }
-//            imgFile.createNewFile();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        return imgFile;
-//    }
-
     public static File createImageFile(File fileDir) throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -42,18 +25,17 @@ public class CameraFeature {
 
         File image = File.createTempFile(
                 imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                fileDir      /* directory */
+                ".jpg",    /* suffix */
+                fileDir         /* directory */
         );
-//        File image = new File(this.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "/pic6189196398872236337.jpg");
-
-
-        // Save a file: path for use with ACTION_VIEW intents
-//        currentPhotoPath = image.getAbsolutePath();
-//        System.out.println(currentPhotoPath);
         return image;
     }
 
+    /**
+     * Deletes the specified image
+     * Used to delete the image once it has been uploaded
+     * @param filePath  The path of the image to delete
+     */
     public static void deleteImageFile(String filePath) {
         File imgFile = new File(filePath);
         try {
@@ -71,7 +53,7 @@ public class CameraFeature {
      * @param imgView   The ImageView component that contains the picture
      * @param imgPath   The path to the image to display
      */
-    public static void setPic(ImageView imgView, String imgPath) {
+    public static Uri setPic(ImageView imgView, String imgPath) {
         // Get the dimensions of the View
         int targetW = imgView.getWidth();
         int targetH = imgView.getHeight();
@@ -94,29 +76,6 @@ public class CameraFeature {
         Bitmap bitmap = BitmapFactory.decodeFile(imgPath, bmOptions);
         imgView.setImageBitmap(bitmap);
 
-
-//        System.out.println(imgPath);
-
-
-//        // From https://stackoverflow.com/questions/4830711/how-to-convert-a-image-into-base64-string
-//        // Encode the image to store it in the database
-//        Bitmap bm = BitmapFactory.decodeFile(currentPhotoPath);
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.JPEG, 1, baos); //bm is the bitmap object
-//        byte[] b = baos.toByteArray();
-//        imgCode = Base64.encodeToString(b, Base64.DEFAULT);
-
-        // Update the image Uri
-        MainActivity.imgUri = Uri.fromFile(new File(imgPath));
+        return Uri.fromFile(new File(imgPath));
     }
-
-//    public static void test() {
-////        String storageDir = Environment.getExternalStorageDirectory().getAbsolutePath();
-////        MainActivity mainActivity = new MainActivity().getI;
-//        String storageDir;
-//        storageDir = Activity.getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
-//        System.out.println(storageDir);
-//
-//
-//    }
 }

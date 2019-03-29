@@ -19,48 +19,48 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
 public class Upload {
 
-    static DatabaseReference databasePost;
-    private static FirebaseStorage storage;
-    private static StorageReference storageReference;
-    protected static ArrayList<String> downloadUrl = new ArrayList<>();
-    protected static String postId;
+    private DatabaseReference databaseReference;
+    private String postKey;
+
     /**
-     * Upload the image (if any)
+     * Uploads the image (if any)
+     * @param context   The context of the activity that calls the method
+     * @param imgView   The ImageView component that contains the image to upload
+     * @param imgUri    The URI of the image stored temporarily on the device
      */
-    protected static void uploadImage(final Context context, final ImageView imgView) {
+    public void uploadImage(final Context context, final ImageView imgView, Uri imgUri) {
 
-        // Firebase storage for images
-        storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference();
+        // Images are stored in Firebase storage, separated from the rest of the post
+        FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+        StorageReference storageReference = firebaseStorage.getReference();
 
-        /** If there is an image, upload it, get the URL and set that URL as argument when calling uploadRest()*/
-        if(MainActivity.imgUri != null)
+        // If there is an image, upload it, get the URL and set that URL as argument when calling uploadRest()
+        if(imgUri != null)
         {
             final ProgressDialog progressDialog = new ProgressDialog(context);
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-//            final StorageReference ref = storageReference.child("images/" + imgUri.getLastPathSegment());
-            final StorageReference ref = storageReference.child("images/pic.jpg");
-            ref.putFile(MainActivity.imgUri)
+            final StorageReference ref = storageReference.child("images/" + imgUri.getLastPathSegment());
+//            final StorageReference ref = storageReference.child("images/pic.jpg");
+            ref.putFile(imgUri)
                     .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
-                            Toast.makeText(context, "Uploaded", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, "Image uploaded!", Toast.LENGTH_SHORT).show();
 
                             ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                 @Override
                                 public void onSuccess(Uri uri) {
-                                    String dlUrl = uri.toString();
+                                    String downloadUrl = uri.toString();
                                     imgView.setImageDrawable(null); // Clear the image view
-                                    addDownloadUrl(dlUrl);
+                                    addDownloadUrl(downloadUrl);
 //                                    downloadUrl.add(dlUrl);
 //                                    System.out.println(downloadUrl.get(0) + "????????????????????");
 //                                    uploadRest(downloadUrl);
@@ -83,38 +83,41 @@ public class Upload {
                             progressDialog.setMessage("Uploaded "+(int)progress+"%");
                         }
                     });
-        } else { /** If there is no image, set the download URL as "" */
-            downloadUrl.add("");
-            System.out.println(downloadUrl.get(0) + "!!!!!!!!!!!!!!!!!!!!!!!!!");
         }
     }
 
     /**
-     * Upload everything but the image (if any) which is stored somewhere else.
+     * Uploads everything but the image (if any) which is stored somewhere else.
+     * @param context   The context of the activity that calls the method
+     * @param textView  The TextView component that contains the text to upload
      */
-    protected static void uploadText(Context context, TextView textView) {
-        databasePost = FirebaseDatabase.getInstance().getReference("Post");
+    protected void uploadText(Context context, TextView textView) {
+        this.databaseReference = FirebaseDatabase.getInstance().getReference("Post");
 
+        // Creates a key for the post
+        this.postKey = this.databaseReference.push().getKey(); // generate an id
+
+        // Sets the body of the post
         String body = textView.getText().toString().trim();
         if (TextUtils.isEmpty(body)) {
             body = "";
         }
 
-        postId = databasePost.push().getKey(); // generate an id
+        // Sets the username
+        String username = "vmado";
 
+        // Generates the timestamp to indicate when the post was created
         Date date = new Date(); // get the UTC time
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         df.setTimeZone(TimeZone.getTimeZone("UTC"));
         String timestamp = df.format(date);
 
-        String username = "vmado"; // set the username
-
-        // Create the post object
-//        Post post = new Post(postKey, body, timestamp, username, downloadUrl.get(0));
-        Post post = new Post(postId, body, timestamp, username, "");
+        // Create the post object using the values above
+        // The imgURL is set to "" while it waits to be assigned when the image is done uploading
+        Post post = new Post(postKey, body, timestamp, username, "");
 
         // Save the post in the database, using the id as primary key
-        databasePost.child(postId).setValue(post);
+        this.databaseReference.child(postKey).setValue(post);
 
         Toast.makeText(context, "Message posted!", Toast.LENGTH_LONG).show();
 
@@ -122,15 +125,13 @@ public class Upload {
         textView.setText("");
     }
 
-    public static void addDownloadUrl(String dlUrl) {
-        databasePost = FirebaseDatabase.getInstance().getReference("Post");
-        databasePost.child(postId).child("imgUrl").setValue(dlUrl);
-    }
-
-
     /**
-     * when the image upload is complete, add the imgUrl to the JSON object
-     *
-     * If everything works, get rid of the static methods and instantiate an Upload oject instead
+     * Overwrite the value associated with the key 'imgUrl' (usually "") with the real download URL
+     * Called after the image has been successfully uploaded.
+     * @param downloadUrl   The URL of the image on the web
      */
+    private void addDownloadUrl(String downloadUrl) {
+        this.databaseReference = FirebaseDatabase.getInstance().getReference("Post");
+        this.databaseReference.child(this.postKey).child("imgUrl").setValue(downloadUrl);
+    }
 }
