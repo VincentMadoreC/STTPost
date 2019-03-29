@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">STTPost</string>
+    <string name="btnConfirm">Confirm</string>
+    <string name="btnCancel">Cancel</string>
 </resources>

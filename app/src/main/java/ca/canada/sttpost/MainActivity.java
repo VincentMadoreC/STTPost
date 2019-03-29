@@ -42,12 +42,13 @@ public class MainActivity extends AppCompatActivity {
 
     static final int REQ_CODE_SPEECH_INPUT = 100;
     static final int REQ_CODE_TAKE_PHOTO = 1;
+    static final int REQ_CODE_EDIT_TEXT = 2;
     public static Uri imgUri;
     public static String fileDir;
     public File photoFile = null;
     public String currentPhotoPath;
 
-    private EditText voiceInput;
+    private TextView voiceInput;
     private TextView btnSpeak;
     private Button btnPost, btnPhoto;
     private ImageView imgView;
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         imgUri = null;
         fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
 
-        voiceInput = (EditText) findViewById(R.id.voiceInput);
+        voiceInput = (TextView) findViewById(R.id.voiceInput);
         imgView = (ImageView) findViewById(R.id.imgView);
         btnSpeak = (TextView) findViewById(R.id.btnSpeak);
         btnPost = (Button) findViewById(R.id.btnPost);
@@ -81,9 +82,17 @@ public class MainActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
+
+        // Tap the TextView to open the TextZoomActivity
+        voiceInput.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchEditIntent();
+            }
+        });
+
         // Tap the button to start the Speech Recognition
         btnSpeak.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 dispatchSpeechIntent();
@@ -133,9 +142,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+        if (intent.resolveActivity(getPackageManager()) != null) {
             // Create the File where the photo should go
             try {
 //                String path = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
@@ -150,13 +159,20 @@ public class MainActivity extends AppCompatActivity {
                 Uri photoURI = FileProvider.getUriForFile(this,
                         "ca.canada.sttpost.fileprovider",
                         photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQ_CODE_TAKE_PHOTO);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(intent, REQ_CODE_TAKE_PHOTO);
             }
         }
     }
 
-    // Receiving and treating speech or picture results
+    // Opens the TextZoomActivity
+    private void dispatchEditIntent() {
+        Intent intent = new Intent(this, TextZoomActivity.class);
+        intent.putExtra("EXTRA_VOICE_INPUT", voiceInput.getText().toString());
+        startActivityForResult(intent, REQ_CODE_EDIT_TEXT);
+    }
+
+    // Receives and treats the results
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -175,6 +191,13 @@ public class MainActivity extends AppCompatActivity {
                     CameraFeature.setPic(imgView, currentPhotoPath);
 //                    setPic();
                 }
+                break;
+            }
+            case REQ_CODE_EDIT_TEXT: {
+                if (resultCode == RESULT_OK) {
+                    voiceInput.setText(data.getData().toString());
+                }
+                break;
             }
         }
     }

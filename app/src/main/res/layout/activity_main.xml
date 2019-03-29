@@ -10,12 +10,12 @@
     android:gravity="center">
 
 
-    <EditText
+    <TextView
         android:id="@+id/voiceInput"
         android:layout_width="0dp"
         android:layout_height="89dp"
+        android:background="#FF0000"
         android:clickable="true"
-        android:editable="true"
         android:focusable="auto"
         android:textSize="16sp"
         android:textStyle="normal"
