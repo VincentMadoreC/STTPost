@@ -16,7 +16,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     public File photoFile = null;
     public String currentPhotoPath;
 
-    private TextView voiceInput;
+    private TextView textView;
     private TextView btnSpeak;
     private Button btnPost, btnPhoto;
     private ImageView imgView;
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         imgUri = null;
         fileDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES).getAbsolutePath();
 
-        voiceInput = (TextView) findViewById(R.id.voiceInput);
+        textView = (TextView) findViewById(R.id.voiceInput);
         imgView = (ImageView) findViewById(R.id.imgView);
         btnSpeak = (TextView) findViewById(R.id.btnSpeak);
         btnPost = (Button) findViewById(R.id.btnPost);
@@ -84,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Tap the TextView to open the TextZoomActivity
-        voiceInput.setOnClickListener(new View.OnClickListener() {
+        textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dispatchEditIntent();
@@ -109,7 +108,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Tap the button to upload the post
         btnPost.setOnClickListener(new View.OnClickListener() {
-
             @Override
             public void onClick(View v) {
                 uploadPost();
@@ -168,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     // Opens the TextZoomActivity
     private void dispatchEditIntent() {
         Intent intent = new Intent(this, TextZoomActivity.class);
-        intent.putExtra("EXTRA_VOICE_INPUT", voiceInput.getText().toString());
+        intent.putExtra("EXTRA_VOICE_INPUT", textView.getText().toString());
         startActivityForResult(intent, REQ_CODE_EDIT_TEXT);
     }
 
@@ -182,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK && null != data) {
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    voiceInput.setText(result.get(0));
+                    textView.setText(result.get(0));
                 }
                 break;
             }
@@ -195,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
             }
             case REQ_CODE_EDIT_TEXT: {
                 if (resultCode == RESULT_OK) {
-                    voiceInput.setText(data.getData().toString());
+                    textView.setText(data.getData().toString());
                 }
                 break;
             }
@@ -207,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void uploadRest(String imgUrl) {
 
-        String body = voiceInput.getText().toString().trim();
+        String body = textView.getText().toString().trim();
         if (TextUtils.isEmpty(body)) {
             body = "";
         }
@@ -229,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, "Message posted!", Toast.LENGTH_LONG).show();
 
         // Clear the text field
-        voiceInput.setText("");
+        textView.setText("");
     }
 
 
@@ -344,13 +342,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void uploadPost() {
-        String body = voiceInput.getText().toString().trim();
+//    private void uploadPost() {
+//        String body = textView.getText().toString().trim();
+//
+//        if (TextUtils.isEmpty(body) && imgView.getDrawable() == null) {
+//            Toast.makeText(this, "Say something or take a picture first!", Toast.LENGTH_LONG).show();
+//        } else {
+//            uploadImage();
+//        }
+//        imgUri = null;
+//    }
 
-        if (TextUtils.isEmpty(body) && imgView.getDrawable() == null) {
+    private void uploadPost() {
+//        if (TextUtils.isEmpty(body) && imgView.getDrawable() == null) {
+        if (textView.getText() == null && imgView.getDrawable() == null) {
             Toast.makeText(this, "Say something or take a picture first!", Toast.LENGTH_LONG).show();
         } else {
-            uploadImage();
+            Upload.uploadText(this, textView);
+            Upload.uploadImage(this, imgView);
         }
         imgUri = null;
     }
@@ -360,5 +369,10 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(path);
         CameraFeature.createImageFile(path);
 //        CameraFeature.test();
+    }
+
+    public void printStuff(View view) {
+        System.out.println(imgUri);
+        System.out.println(Upload.downloadUrl);
     }
 }
