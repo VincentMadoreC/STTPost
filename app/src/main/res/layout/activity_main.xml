@@ -1,78 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativeLayout"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_above="@+id/textView1"
     android:layout_toLeftOf="@+id/textView1"
-    android:gravity="center"
-    android:orientation="vertical" >
+    android:gravity="center">
 
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <EditText
+        android:id="@+id/voiceInput"
+        android:layout_width="0dp"
+        android:layout_height="89dp"
+        android:clickable="true"
+        android:editable="true"
+        android:focusable="auto"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/voiceInput"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="100dp"
-            android:clickable="true"
-            android:editable="true"
-            android:focusable="auto"
-            android:textSize="26sp"
-            android:textStyle="normal" />
+    <ImageView
+        android:id="@+id/imgView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/btnSpeak"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/voiceInput" />
 
-        <ImageView
-            android:id="@+id/imgView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/btnSpeak"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:background="@color/colorPrimary"
+        android:clickable="true"
         android:gravity="center"
-        android:orientation="vertical" >
+        android:padding="16dp"
+        android:text="Tap to Open Mic"
+        android:textColor="@color/colorAccent"
+        android:textSize="22sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toTopOf="@+id/btnPhoto"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <TextView
-            android:clickable="true"
-            android:gravity="center"
-            android:padding="16dp"
-            android:textColor="@color/colorAccent"
-            android:background="@color/colorPrimary"
-            android:id="@+id/btnSpeak"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:text="Tap to Open Mic"
-            android:textSize="22sp"
-            android:textStyle="normal" />
+    <Button
+        android:id="@+id/btnPhoto"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Photo"
+        app:layout_constraintBottom_toTopOf="@+id/btnPost"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
-            android:id="@+id/btnPhoto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Photo" />
+    <Button
+        android:id="@+id/btnPost"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Post"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-        <Button
-            android:id="@+id/btnPost"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Post" />
 
-        <Button
-            android:id="@+id/btnTest"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="test"
-            android:text="Test" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>
